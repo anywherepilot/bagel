@@ -1,0 +1,23 @@
+{
+  "name": "bagel",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/anywherepilot/bagel.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/anywherepilot/bagel/issues"
+  },
+  "homepage": "https://github.com/anywherepilot/bagel#readme",
+  "dependencies": {
+    "@actions/core": "^1.2.5"
+  }
+}

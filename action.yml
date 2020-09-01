@@ -1,0 +1,12 @@
+name: 'Bagel'
+description: 'Meet your teammates'
+inputs:
+  slack-aliases:
+    description: 'Comma separated list of Slack aliases to pair up.'
+    required: true
+  slack-webhook:
+    description: 'The Slack web hook for posting messages.'
+    required: true
+runs:
+  using: 'node12'
+  main: 'index.js'
