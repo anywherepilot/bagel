@@ -7,9 +7,9 @@ try {
     // KFY shuffle the array by swapping elements from back to front with random ones before them
     for(let i = aliases.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
-        var temp = array[i];
-        array[i] = array[j];
-        array[j] = temp;
+        var temp = aliases[i];
+        aliases[i] = aliases[j];
+        aliases[j] = temp;
     }
 
     console.log('Sending invitations for ' + aliases);
