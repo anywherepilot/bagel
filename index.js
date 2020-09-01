@@ -1,4 +1,5 @@
 const core = require('@actions/core')
+const request = require('request');
 
 try {
     const slackAliasesCsv = core.getInput('slack-aliases');
@@ -15,12 +16,16 @@ try {
     console.log('Sending invitations for ' + aliases);
 
     const slackWebhook = core.getInput('slack-webhook');
-    const request = new XMLHttpRequest();
-    request.open('POST', slackWebhook);
-    request.setRequestHeader('Content-Type', 'application/json');
-    request.send(JSON.stringify({
-        text: "Testing!"
-    }));
+
+    request.post(
+        slackWebhook,
+        { json: { text: 'Testing!'} },
+        function(error, response, body) {
+            if(error) {
+                core.setFailed(error.message);
+            }
+        }
+    )
 
     console.log('Invitations sent');
 } catch (error) {
