@@ -13,13 +13,21 @@ try {
         aliases[j] = temp;
     }
 
-    console.log('Sending invitations for ' + aliases);
+    let message = "Here are the pairs for this round!\n"
+
+    for(let i = 0; i < aliases.length; i += 2) {
+        if(i == aliases.length - 1) {
+            message += ", " + aliases[i];
+        } else {
+            message += "\n-" + aliases[i] + ", " + aliases[i + 1];
+        }
+    }
 
     const slackWebhook = core.getInput('slack-webhook');
 
     request.post(
         slackWebhook,
-        { json: { text: 'Testing!'} },
+        { json: { text: message} },
         function(error, response, body) {
             if(error) {
                 console.log('Failed to send message: ' + error.message);
