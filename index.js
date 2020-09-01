@@ -22,12 +22,14 @@ try {
         { json: { text: 'Testing!'} },
         function(error, response, body) {
             if(error) {
+                console.log('Failed to send message: ' + error.message);
                 core.setFailed(error.message);
+            } else {
+                console.log('Invitations sent');
             }
         }
     )
 
-    console.log('Invitations sent');
 } catch (error) {
     core.setFailed(error.message);
 }
