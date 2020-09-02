@@ -3,6 +3,8 @@ const core = require("@actions/core");
 const github = require("@actions/github");
 const qs = require("qs");
 
+const NUM_ITERATIONS = 1000;
+
 try {
     const slackApiToken = core.getInput("slack-api-token");
     if (slackApiToken) bakeGreatBagels(slackApiToken).then();
@@ -66,34 +68,117 @@ async function bakeBasicBagels() {
     const githubToken = core.getInput("github-token");
     const octokit = github.getOctokit(githubToken);
 
-    await octokit.issues.create({
-        owner: 'anywherepilot',
-        repo: 'bagel-test',
-        title: 'test 1'
+    const repoOwnerName = github.context.payload.repository.owner.name;
+    const repoName = github.context.payload.repository.name;
+    const historyIssueTitle = "Bagel history";
+
+    // Get the history issue
+    const { data: issues } = await octokit.issues.listForRepo({
+        owner: repoOwnerName,
+        repo: repoName
     });
+    
+    const historyIssue = issues.find(i => i.title === historyIssueTitle);
+    if(!historyIssue) {
+        const response = await octokit.issues.create({
+            owner: repoOwnerName,
+            repo: repoName,
+            title: historyIssueTitle
+        });
+        historyIssue = response.data;
+    }
 
-    shuffleArray(aliases);
+    const history = historyIssue.body;
 
+    // Throw some brute force compute at this
+    let bestCombination;
+    let highestScore = 0;
+    for(let i = 0; i < NUM_ITERATIONS; i++) {
+        bestCombination = createRandomPairs(aliases);
+        score = score(bestCombination, history);
+        if(score > highestScore) {
+            highestScore = score;
+            bestCombination = [...aliases];
+        }
+    }
+
+    // Send out the list
     let message = "Here are the pairs for this round!\n";
 
-    for (let i = 0; i < aliases.length; i += 2) {
-        if (i == aliases.length - 1) {
-            message += ", " + aliases[i];
+    for (let i = 0; i < bestCombination.length; i += 2) {
+        if (i == bestCombination.length - 1) {
+            message += ", " + bestCombination[i];
         } else {
-            message += "\n-" + aliases[i] + ", " + aliases[i + 1];
+            message += "\n-" + bestCombination[i] + ", " + bestCombination[i + 1];
         }
     }
 
     const slackWebhook = core.getInput("slack-webhook");
 
-    request.post(slackWebhook, { json: { text: message } }, function (error, response, body) {
-        if (error) {
-            console.log("Failed to send message: " + error.message);
-            core.setFailed(error.message);
-        } else {
-            console.log("Invitations sent");
-        }
+    const response = await axios.post(slackWebhook, { text: message })
+    if (response.status != 200) {
+        core.setFailed(response.statusText);
+        return undefined;
+    }
+    if (!response.data.ok) {
+        core.setFailed(response.data.error);
+        return undefined;
+    }
+
+    // Update the history
+    const newHistory = history + "\n" + JSON.stringify(bestCombination);
+    await octokit.issues.update({
+        owner: repoOwnerName,
+        repo: repoName,
+        issue_number: historyIssue.number,
+        body: newHistory
     });
+}
+
+function score(pairs, history) {
+    let score = 0;
+
+    // For each pair
+    for(let pair in pairs) {
+        let foundInHistory = false;
+        // Go back through history
+        for(let i = history.length - 1; i >= 0; i++) {
+            const historicPairs = history[i];
+            // Check if this pair occurred back then
+            // TODO handle the odd case
+            if(historicPairs.some(historicPair => pair.every(alias => historicPair.includes(alias)))) {
+                // The longer ago, the better
+                score += history.length - 1 - i;
+                foundInHistory = true;
+                break;
+            }
+        }
+
+        // Prioritize new pairs hard
+        if(!foundInHistory) score += 100;
+    }
+
+    return score;
+}
+
+function createRandomPairs(aliases) {
+    const shuffled = shuffleArray([...aliases]);
+    const pairs = [];
+    if(shuffled.length === 1) {
+        return shuffled;
+    }
+    if(shuffled.length % 2 !== 0) {
+        for(let i = 0; i < shuffled.length - 3; i++) {
+            pairs.push([shuffled[i], shuffled[i + 1]]);
+        }
+        pairs.push([shuffled[shuffled.length - 3], shuffled[shuffled.length - 2], shuffled[shuffled.length - 1]]);
+    }
+    else {
+        for(let i = 0; i < shuffled.length; i++) {
+            pairs.push([shuffled[i], shuffled[i + 1]]);
+        }
+    }
+    return pairs;
 }
 
 function shuffleArray(array) {
