@@ -3,7 +3,7 @@ const axios = require("axios");
 
 try {
   const slackApiToken = core.getInput("slack-api-token");
-  if (slackApiToken) bakeGreatBagels(slackApiToken);
+  if (slackApiToken) bakeGreatBagels(slackApiToken).then();
   else bakeBasicBagels();
 } catch (error) {
   core.setFailed(error.message);
@@ -19,7 +19,8 @@ async function bakeGreatBagels(slackApiToken) {
   // Get the list of channels
   let allChannels;
   const response = await axios.post("https://slack.com/api/conversations.list", { token: slackApiToken });
-  console.log(JSON.stringify(response));
+  console.log(response);
+  console.log(response.data);
   
 //     .then(response, body) {
 //     if (error) {
