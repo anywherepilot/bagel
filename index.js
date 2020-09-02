@@ -78,7 +78,7 @@ async function bakeBasicBagels() {
         repo: repoName
     });
     
-    const historyIssue = issues.find(i => i.title === historyIssueTitle);
+    let historyIssue = issues.find(i => i.title === historyIssueTitle);
     let history;
     if(!historyIssue) {
         const response = await octokit.issues.create({
