@@ -102,12 +102,11 @@ async function bakeBasicBagels() {
     let currentScore;
     for (let i = 0; i < NUM_ITERATIONS; i++) {
         currentCombination = createRandomPairs(aliases);
-        console.log(`Iteration ${i}: ${currentCombination}`);
         currentScore = score(currentCombination, history);
         if (currentScore > highestScore) {
             highestScore = currentScore;
             bestCombination = currentCombination;
-            console.log(`New highest score: ${highestScore}, for combination ${JSON.stringify(bestCombination)}`);
+            console.log(`New highest score in iteration ${i}: ${highestScore}, for combination ${JSON.stringify(bestCombination)}`);
         }
     }
 
@@ -115,7 +114,7 @@ async function bakeBasicBagels() {
     let message = "Here are the pairs for this round!\n";
 
     for (let pair of bestCombination) {
-        message += "\n-" + pair.join(", ");
+        message += "\n- " + pair.join(", ");
     }
 
     const slackWebhook = core.getInput("slack-webhook");
@@ -132,7 +131,7 @@ async function bakeBasicBagels() {
 
     // Update the history
     history.push(bestCombination);
-    console.log("Storing new full history:\n" + JSON.stringify(history));
+    console.log(`Storing new full history in issue ${historyIssue.number}:\n` + JSON.stringify(history));
     await octokit.issues.update({
         owner: repoOwnerName,
         repo: repoName,
