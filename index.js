@@ -119,18 +119,17 @@ async function bakeBasicBagels() {
 
     const slackWebhook = core.getInput("slack-webhook");
 
-    const response = await axios.post(slackWebhook, { text: message });
+    await axios.post(slackWebhook, { text: message });
 
     // Update the history
     history.push(bestCombination);
     console.log(`Storing new full history in issue ${historyIssue.number}:\n` + JSON.stringify(history));
-    response = await octokit.issues.update({
+    await octokit.issues.update({
         owner: repoOwnerName,
         repo: repoName,
         issue_number: historyIssue.number,
         body: JSON.stringify(history),
     });
-    console.log(JSON.stringify(response));
 }
 
 function score(pairs, history) {
