@@ -31,20 +31,9 @@ async function bakeGreatBagels(slackApiToken) {
     }
 
     // Get the list of members of the channel
-    let members;
-    url = "https://slack.com/api/conversations.members";
-    data = { token: slackApiToken, channel: channel.id };
-    response = await axios.post(url, qs.stringify(data), config);
-    if (response.status != 200) {
-      core.setFailed(response.statusText);
-      return;
-    }
-    if (!response.data.ok) {
-      core.setFailed(response.data.error);
-      return;
-    }
-    // TODO pagination
-    members = response.data.members;
+    responseData = await callSlackApi("conversations.members", { token: slackApiToken, channel: channel.id });
+    if(!responseData) continue;
+    members = responseData.members;
 
     console.log(members);
 
