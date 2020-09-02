@@ -1,5 +1,6 @@
-const core = require("@actions/core");
 const axios = require("axios");
+const core = require("@actions/core");
+const qs = require("qs");
 
 try {
   const slackApiToken = core.getInput("slack-api-token");
@@ -18,58 +19,65 @@ async function bakeGreatBagels(slackApiToken) {
 
   // Get the list of channels
   let allChannels;
-  const response = await axios.post("https://slack.com/api/conversations.list", { token: slackApiToken });
+  const url = "https://slack.com/api/conversations.list";
+  const data = { token: slackApiToken };
+  const config = {
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+  };
+  const response = await axios.post(url, qs.stringify(data), config);
   console.log(response);
   console.log(response.data);
-  
-//     .then(response, body) {
-//     if (error) {
-//       core.setFailed(error.message);
-//       return;
-//     }
-//     if (response.statusCode != 200 || !body.ok) {
-//       core.setFailed(body.error);
-//       return;
-//     }
-//     // TODO pagination
-//     console.log(JSON.stringify(body));
-//     console.log(body.channels);
-//     allChannels = body.channels;
-//   });
 
-//   for (let channelName of pairingChannelNames) {
-//     // Find the ID of the channel
-//     channel = allChannels.find((c) => c.name === channelName);
-//     if (!channel) {
-//       core.warning("No such channel: " + channelName);
-//       continue;
-//     }
+  //     .then(response, body) {
+  //     if (error) {
+  //       core.setFailed(error.message);
+  //       return;
+  //     }
+  //     if (response.statusCode != 200 || !body.ok) {
+  //       core.setFailed(body.error);
+  //       return;
+  //     }
+  //     // TODO pagination
+  //     console.log(JSON.stringify(body));
+  //     console.log(body.channels);
+  //     allChannels = body.channels;
+  //   });
 
-//     // Get the list of members of the channel
-//     let members;
-//     request.post("https://slack.com/api/conversations.members", { form: { token: slackApiToken, channel: channel.id } }, function (
-//       error,
-//       response,
-//       body
-//     ) {
-//       if (error) {
-//         core.setFailed(error.message);
-//         return;
-//       }
-//       if (response.statusCode != 200 || !body.ok) {
-//         core.setFailed(body.error);
-//         return;
-//       }
-//       // TODO pagination
-//       members = body.members;
-//     });
+  //   for (let channelName of pairingChannelNames) {
+  //     // Find the ID of the channel
+  //     channel = allChannels.find((c) => c.name === channelName);
+  //     if (!channel) {
+  //       core.warning("No such channel: " + channelName);
+  //       continue;
+  //     }
 
-//     console.log(members);
+  //     // Get the list of members of the channel
+  //     let members;
+  //     request.post("https://slack.com/api/conversations.members", { form: { token: slackApiToken, channel: channel.id } }, function (
+  //       error,
+  //       response,
+  //       body
+  //     ) {
+  //       if (error) {
+  //         core.setFailed(error.message);
+  //         return;
+  //       }
+  //       if (response.statusCode != 200 || !body.ok) {
+  //         core.setFailed(body.error);
+  //         return;
+  //       }
+  //       // TODO pagination
+  //       members = body.members;
+  //     });
 
-//     // Shuffle them into pairs
-//     // Attempt to get their names
-//     // Create conversations
-//   }
+  //     console.log(members);
+
+  //     // Shuffle them into pairs
+  //     // Attempt to get their names
+  //     // Create conversations
+  //   }
 }
 
 function bakeBasicBagels() {
