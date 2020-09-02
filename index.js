@@ -3,7 +3,7 @@ const core = require("@actions/core");
 const github = require("@actions/github");
 const qs = require("qs");
 
-const NUM_ITERATIONS = 10;
+const NUM_ITERATIONS = 1000;
 
 try {
     const slackApiToken = core.getInput("slack-api-token");
