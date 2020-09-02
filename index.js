@@ -141,7 +141,7 @@ async function bakeBasicBagels() {
 }
 
 function score(pairs, history) {
-    let score = 0;
+    let result = 0;
 
     // For each pair
     for(let pair in pairs) {
@@ -153,17 +153,17 @@ function score(pairs, history) {
             // TODO handle the odd case
             if(historicPairs.some(historicPair => pair.every(alias => historicPair.includes(alias)))) {
                 // The longer ago, the better
-                score += history.length - 1 - i;
+                result += history.length - 1 - i;
                 foundInHistory = true;
                 break;
             }
         }
 
         // Prioritize new pairs hard
-        if(!foundInHistory) score += 100;
+        if(!foundInHistory) result += 100;
     }
 
-    return score;
+    return result;
 }
 
 function createRandomPairs(aliases) {
