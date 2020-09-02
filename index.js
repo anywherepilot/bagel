@@ -28,6 +28,8 @@ function bakeGreatBagels(slackApiToken) {
       return;
     }
     // TODO pagination
+    console.log(JSON.stringify(body));
+    console.log(body.channels);
     allChannels = body.channels;
   });
 
