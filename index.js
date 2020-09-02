@@ -6,7 +6,7 @@ const qs = require("qs");
 try {
     const slackApiToken = core.getInput("slack-api-token");
     if (slackApiToken) bakeGreatBagels(slackApiToken).then();
-    else bakeBasicBagels();
+    else bakeBasicBagels().then();
 } catch (error) {
     core.setFailed(error.message);
 }
@@ -56,7 +56,7 @@ async function bakeGreatBagels(slackApiToken) {
     }
 }
 
-function bakeBasicBagels() {
+async function bakeBasicBagels() {
     const slackAliasesCsv = core.getInput("slack-aliases");
     const aliases = slackAliasesCsv
         .split(",")
