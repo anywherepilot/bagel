@@ -10,8 +10,8 @@ try {
 }
 
 function bakeGreatBagels(slackApiToken) {
-  const pairingChannelsCsv = core.getInput("pairing-channels");
-  const pairingChannels = pairingChannelsCsv
+  const pairingChannelNamesCsv = core.getInput("pairing-channels");
+  const pairingChannelNames = pairingChannelNamesCsv
     .split(",")
     .map((channel) => channel.trim())
     .map((channel) => (channel.startsWith("#") ? channel.substr(1) : channel));
@@ -19,19 +19,47 @@ function bakeGreatBagels(slackApiToken) {
   // Get the list of channels
   let allChannels;
   request.post("https://slack.com/api/conversations.list", { form: { token: slackApiToken } }, function (error, response, body) {
-    if (response.statusCode != 200 || !body.ok) core.setFailed(body.error);
-    allChannels = response.channels;
-    console.log("response:");
-    console.log(JSON.stringify(response));
-    console.log("body:");
-    console.log(JSON.stringify(body));
-    console.log("error:");
-    console.log(JSON.stringify(error));
+    if (error) {
+      core.setFailed(error.message);
+      return;
+    }
+    if (response.statusCode != 200 || !body.ok) {
+      core.setFailed(body.error);
+      return;
+    }
+    // TODO pagination
+    allChannels = body.channels;
   });
 
-  for (let channel of pairingChannels) {
+  for (let channelName of pairingChannelNames) {
     // Find the ID of the channel
+    channel = allChannels.find((c) => c.name === channelName);
+    if (!channel) {
+      core.warning("No such channel: " + channelName);
+      continue;
+    }
+
     // Get the list of members of the channel
+    let members;
+    request.post("https://slack.com/api/conversations.members", { form: { token: slackApiToken, channel: channel.id } }, function (
+      error,
+      response,
+      body
+    ) {
+      if (error) {
+        core.setFailed(error.message);
+        return;
+      }
+      if (response.statusCode != 200 || !body.ok) {
+        core.setFailed(body.error);
+        return;
+      }
+      // TODO pagination
+      members = body.members;
+    });
+
+    console.log(members);
+
     // Shuffle them into pairs
     // Attempt to get their names
     // Create conversations
