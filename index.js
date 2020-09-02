@@ -18,10 +18,10 @@ function bakeGreatBagels(slackApiToken) {
 
   // Get the list of channels
   let allChannels;
-  request.get("https://slack.com/api/conversations.list", { form: { token: slackApiToken } }, function (error, response, body) {
-      if(response.statusCode != 200 || !body.ok) core.setFailed(body.error);
-      allChannels = response.channels;
-      console.log(JSON.stringify(response));
+  request.post("https://slack.com/api/conversations.list", { form: { token: slackApiToken } }, function (error, response, body) {
+    if (response.statusCode != 200 || !body.ok) core.setFailed(body.error);
+    allChannels = response.channels;
+    console.log(JSON.stringify(response));
   });
 
   for (let channel of pairingChannels) {
