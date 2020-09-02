@@ -77,7 +77,7 @@ async function bakeBasicBagels() {
 
     let historyIssue = issues.find((i) => i.title === historyIssueTitle);
     let history;
-    if (!historyIssue || !historyIssue.body || historyIssue.body.length === 0) {
+    if (!historyIssue) {
         console.log("No history issue found: creating");
         const response = await octokit.issues.create({
             owner: repoOwnerName,
@@ -88,7 +88,11 @@ async function bakeBasicBagels() {
         history = [];
     } else {
         console.log(`Working with history: ${historyIssue.body}`);
-        history = JSON.parse(historyIssue.body);
+        if (historyIssue.body && historyIssue.body.length > 0) {
+            history = JSON.parse(historyIssue.body);
+        } else {
+            history = [];
+        }
     }
 
     // Throw some brute force compute at this
