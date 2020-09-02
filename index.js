@@ -3,7 +3,7 @@ const core = require("@actions/core");
 const github = require("@actions/github");
 const qs = require("qs");
 
-const NUM_ITERATIONS = 1000;
+const NUM_ITERATIONS = 10;
 
 try {
     const slackApiToken = core.getInput("slack-api-token");
@@ -149,6 +149,7 @@ function score(pairs, history) {
         // Go back through history
         for (let i = history.length - 1; i >= 0; i++) {
             const historicPairs = history[i];
+            console.log("historicPairs: " + historicPairs);
             // Check if this pair occurred back then
             // TODO handle the odd case
             for (let historicPair of historicPairs) {
