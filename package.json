@@ -18,9 +18,10 @@
   },
   "homepage": "https://github.com/anywherepilot/bagel#readme",
   "dependencies": {
-    "@actions/core": "^1.2.5",
-    "axios": "^0.20.0",
-    "qs": "^6.9.4"
+    "@actions/core": "1.2.5",
+    "@actions/github": "4.0.0",
+    "axios": "0.20.0",
+    "qs": "6.9.4"
   },
   "devDependencies": {
     "prettier": "^2.1.1"
