@@ -102,6 +102,7 @@ async function bakeBasicBagels() {
     let currentScore;
     for (let i = 0; i < NUM_ITERATIONS; i++) {
         currentCombination = createRandomPairs(aliases);
+        console.log(`Iteration ${i}: ${currentCombination}`);
         currentScore = score(currentCombination, history);
         if (currentScore > highestScore) {
             highestScore = currentScore;
