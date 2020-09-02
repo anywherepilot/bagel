@@ -143,12 +143,15 @@ function score(pairs, history) {
             const historicPairs = history[i];
             // Check if this pair occurred back then
             // TODO handle the odd case
-            if (historicPairs.some((historicPair) => pair.every((alias) => historicPair.includes(alias)))) {
-                // The longer ago, the better
-                result += history.length - 1 - i;
-                foundInHistory = true;
-                break;
+            for(let historicPair of historicPairs) {
+                if (pair.every((alias) => historicPair.includes(alias))) {
+                    // The longer ago, the better
+                    result += history.length - 1 - i;
+                    foundInHistory = true;
+                    break;
+                }
             }
+            if(foundInHistory) break;        
         }
 
         // Prioritize new pairs hard
