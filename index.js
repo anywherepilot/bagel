@@ -101,7 +101,7 @@ async function bakeBasicBagels() {
         bestCombination = createRandomPairs(aliases);
         newScore = score(bestCombination, history);
         if(newScore > highestScore) {
-            console.log(`New highest score: ${highestScore}, for combination ${JSON.stringify(bestCombination)}`);
+            console.log(`New highest score: ${newScore}, for combination ${JSON.stringify(bestCombination)}`);
             highestScore = newScore;
             bestCombination = [...aliases];
         }
@@ -131,12 +131,12 @@ async function bakeBasicBagels() {
     }
 
     // Update the history
-    const newHistory = history + "\n" + JSON.stringify(bestCombination);
+    history.push(bestCombination);
     await octokit.issues.update({
         owner: repoOwnerName,
         repo: repoName,
         issue_number: historyIssue.number,
-        body: newHistory
+        body: JSON.stringify(history)
     });
 }
 
