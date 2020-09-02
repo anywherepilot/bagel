@@ -79,6 +79,7 @@ async function bakeBasicBagels() {
     });
     
     const historyIssue = issues.find(i => i.title === historyIssueTitle);
+    let history;
     if(!historyIssue) {
         const response = await octokit.issues.create({
             owner: repoOwnerName,
@@ -86,9 +87,10 @@ async function bakeBasicBagels() {
             title: historyIssueTitle
         });
         historyIssue = response.data;
+        history = [];
+    } else {
+        history = JSON.parse(historyIssue.body);
     }
-
-    const history = JSON.parse(historyIssue.body) || [];
 
     // Throw some brute force compute at this
     let bestCombination;
