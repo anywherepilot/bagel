@@ -95,6 +95,8 @@ async function bakeBasicBagels() {
         }
     }
 
+    console.log(`History: ${history}`);
+
     let bestCombination;
     if (history.length === 0) {
         bestCombination = createRandomPairs(aliases);
