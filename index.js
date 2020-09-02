@@ -107,8 +107,8 @@ async function bakeBasicBagels() {
     // Send out the list
     let message = "Here are the pairs for this round!\n";
 
-    for (let pair in bestCombination) {
-        message += "\n-" + pair.map(alias => "@" + alias).join(", ");
+    for (let pair of bestCombination) {
+        message += "\n-" + pair.join(", ");
     }
 
     const slackWebhook = core.getInput("slack-webhook");
@@ -138,7 +138,7 @@ function score(pairs, history) {
     let result = 0;
 
     // For each pair
-    for (let pair in pairs) {
+    for (let pair of pairs) {
         let foundInHistory = false;
         // Go back through history
         for (let i = history.length - 1; i >= 0; i++) {
