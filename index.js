@@ -149,7 +149,6 @@ function score(pairs, history) {
         // Go back through history
         for (let i = history.length - 1; i >= 0; i--) {
             const historicPairs = history[i];
-            console.log("historicPairs: " + JSON.stringify(historicPairs));
             // Check if this pair occurred back then
             // TODO handle the odd case
             for (let historicPair of historicPairs) {
@@ -184,7 +183,7 @@ function createRandomPairs(aliases) {
         }
         pairs.push([shuffled[shuffled.length - 3], shuffled[shuffled.length - 2], shuffled[shuffled.length - 1]]);
     } else {
-        for (let i = 0; i < shuffled.length; i++) {
+        for (let i = 0; i < shuffled.length; i += 2) {
             pairs.push([shuffled[i], shuffled[i + 1]]);
         }
     }
