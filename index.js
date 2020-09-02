@@ -120,15 +120,6 @@ async function bakeBasicBagels() {
     const slackWebhook = core.getInput("slack-webhook");
 
     const response = await axios.post(slackWebhook, { text: message });
-    console.log("Response from webhook call: " + response);
-    if (response.status != 200) {
-        core.setFailed(response.statusText);
-        return undefined;
-    }
-    if (!response.data.ok) {
-        core.setFailed(response.data.error);
-        return undefined;
-    }
 
     // Update the history
     history.push(bestCombination);
