@@ -18,25 +18,9 @@ async function bakeGreatBagels(slackApiToken) {
     .map((channel) => (channel.startsWith("#") ? channel.substr(1) : channel));
 
   // Get the list of channels
-  let allChannels;
-  let url = "https://slack.com/api/conversations.list";
-  let data = { token: slackApiToken };
-  const config = {
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-  };
-  let response = await axios.post(url, qs.stringify(data), config);
-  if (response.status != 200) {
-    core.setFailed(response.statusText);
-    return;
-  }
-  if (!response.data.ok) {
-    core.setFailed(response.data.error);
-    return;
-  }
-  // TODO pagination
-  allChannels = response.data.channels;
+  let responseData = await callSlackApi("conversations.list", { token: slackApiToken });
+  if(!responseData) return;
+  const allChannels = responseData.channels;
 
   for (let channelName of pairingChannelNames) {
     // Find the ID of the channel
@@ -105,4 +89,24 @@ function bakeBasicBagels() {
       console.log("Invitations sent");
     }
   });
+}
+
+async function callSlackApi(method, arguments) {
+    const url = `https://slack.com/api/${method}`;
+    const config = {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    };
+    const response = await axios.post(url, qs.stringify(arguments), config);
+    if (response.status != 200) {
+      core.setFailed(response.statusText);
+      return undefined;
+    }
+    if (!response.data.ok) {
+      core.setFailed(response.data.error);
+      return undefined;
+    }
+    // TODO pagination
+    return response.data;
 }
