@@ -93,14 +93,16 @@ async function bakeBasicBagels() {
 
     // Throw some brute force compute at this
     let bestCombination;
+    let currentCombination;
     let highestScore = 0;
+    let currentScore;
     for (let i = 0; i < NUM_ITERATIONS; i++) {
-        bestCombination = createRandomPairs(aliases);
-        newScore = score(bestCombination, history);
-        if (newScore > highestScore) {
-            console.log(`New highest score: ${newScore}, for combination ${JSON.stringify(bestCombination)}`);
-            highestScore = newScore;
-            bestCombination = [...aliases];
+        currentCombination = createRandomPairs(aliases);
+        currentScore = score(bestCombination, history);
+        if (currentScore > highestScore) {
+            highestScore = currentScore;
+            bestCombination = currentCombination;
+            console.log(`New highest score: ${highestScore}, for combination ${JSON.stringify(bestCombination)}`);
         }
     }
 
