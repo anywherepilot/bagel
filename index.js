@@ -9,7 +9,7 @@ try {
   core.setFailed(error.message);
 }
 
-function bakeGreatBagels(slackApiToken) {
+async function bakeGreatBagels(slackApiToken) {
   const pairingChannelNamesCsv = core.getInput("pairing-channels");
   const pairingChannelNames = pairingChannelNamesCsv
     .split(",")
