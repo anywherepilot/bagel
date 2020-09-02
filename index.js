@@ -162,7 +162,9 @@ function score(pairs, history) {
 }
 
 function createRandomPairs(aliases) {
-    const shuffled = shuffleArray([...aliases]);
+    const shuffled = Array.from(aliases);
+    shuffleArray(shuffled);
+    
     const pairs = [];
     if(shuffled.length === 1) {
         return shuffled;
