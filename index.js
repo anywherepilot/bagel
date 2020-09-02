@@ -22,7 +22,7 @@ async function bakeGreatBagels(slackApiToken) {
 
     // Find out which scopes we have
     let responseData = await callSlackApi("apps.permissions.scopes.list", { token: slackApiToken });
-    if(!responseData) return;
+    if (!responseData) return;
     const scopes = responseData.scopes;
 
     // Get the list of channels
@@ -49,10 +49,7 @@ async function bakeGreatBagels(slackApiToken) {
 
         for (let i = 0; i < members.length; i += 2) {
             // TODO handle odd case
-
             // Attempt to get their names
-            
-
             // Create conversation
         }
     }
@@ -75,17 +72,17 @@ async function bakeBasicBagels() {
     // Get the history issue
     const { data: issues } = await octokit.issues.listForRepo({
         owner: repoOwnerName,
-        repo: repoName
+        repo: repoName,
     });
-    
-    let historyIssue = issues.find(i => i.title === historyIssueTitle);
+
+    let historyIssue = issues.find((i) => i.title === historyIssueTitle);
     let history;
-    if(!historyIssue) {
-        console.log("No history issue found: creating")
+    if (!historyIssue) {
+        console.log("No history issue found: creating");
         const response = await octokit.issues.create({
             owner: repoOwnerName,
             repo: repoName,
-            title: historyIssueTitle
+            title: historyIssueTitle,
         });
         historyIssue = response.data;
         history = [];
@@ -97,10 +94,10 @@ async function bakeBasicBagels() {
     // Throw some brute force compute at this
     let bestCombination;
     let highestScore = 0;
-    for(let i = 0; i < NUM_ITERATIONS; i++) {
+    for (let i = 0; i < NUM_ITERATIONS; i++) {
         bestCombination = createRandomPairs(aliases);
         newScore = score(bestCombination, history);
-        if(newScore > highestScore) {
+        if (newScore > highestScore) {
             console.log(`New highest score: ${newScore}, for combination ${JSON.stringify(bestCombination)}`);
             highestScore = newScore;
             bestCombination = [...aliases];
@@ -110,17 +107,13 @@ async function bakeBasicBagels() {
     // Send out the list
     let message = "Here are the pairs for this round!\n";
 
-    for (let i = 0; i < bestCombination.length; i += 2) {
-        if (i == bestCombination.length - 1) {
-            message += ", " + bestCombination[i];
-        } else {
-            message += "\n-" + bestCombination[i] + ", " + bestCombination[i + 1];
-        }
+    for (let pair in bestCombination) {
+        message += "\n-" + pair.map(alias => "@" + alias).join(", ");
     }
 
     const slackWebhook = core.getInput("slack-webhook");
 
-    const response = await axios.post(slackWebhook, { text: message })
+    const response = await axios.post(slackWebhook, { text: message });
     if (response.status != 200) {
         core.setFailed(response.statusText);
         return undefined;
@@ -132,11 +125,12 @@ async function bakeBasicBagels() {
 
     // Update the history
     history.push(bestCombination);
+    console.log("Storing new full history:\n" + JSON.stringify(history));
     await octokit.issues.update({
         owner: repoOwnerName,
         repo: repoName,
         issue_number: historyIssue.number,
-        body: JSON.stringify(history)
+        body: JSON.stringify(history),
     });
 }
 
@@ -144,14 +138,14 @@ function score(pairs, history) {
     let result = 0;
 
     // For each pair
-    for(let pair in pairs) {
+    for (let pair in pairs) {
         let foundInHistory = false;
         // Go back through history
-        for(let i = history.length - 1; i >= 0; i++) {
+        for (let i = history.length - 1; i >= 0; i++) {
             const historicPairs = history[i];
             // Check if this pair occurred back then
             // TODO handle the odd case
-            if(historicPairs.some(historicPair => pair.every(alias => historicPair.includes(alias)))) {
+            if (historicPairs.some((historicPair) => pair.every((alias) => historicPair.includes(alias)))) {
                 // The longer ago, the better
                 result += history.length - 1 - i;
                 foundInHistory = true;
@@ -160,7 +154,7 @@ function score(pairs, history) {
         }
 
         // Prioritize new pairs hard
-        if(!foundInHistory) result += 100;
+        if (!foundInHistory) result += 100;
     }
 
     return result;
@@ -169,19 +163,18 @@ function score(pairs, history) {
 function createRandomPairs(aliases) {
     const shuffled = Array.from(aliases);
     shuffleArray(shuffled);
-    
+
     const pairs = [];
-    if(shuffled.length === 1) {
+    if (shuffled.length === 1) {
         return shuffled;
     }
-    if(shuffled.length % 2 !== 0) {
-        for(let i = 0; i < shuffled.length - 3; i++) {
+    if (shuffled.length % 2 !== 0) {
+        for (let i = 0; i < shuffled.length - 3; i += 2) {
             pairs.push([shuffled[i], shuffled[i + 1]]);
         }
         pairs.push([shuffled[shuffled.length - 3], shuffled[shuffled.length - 2], shuffled[shuffled.length - 1]]);
-    }
-    else {
-        for(let i = 0; i < shuffled.length; i++) {
+    } else {
+        for (let i = 0; i < shuffled.length; i++) {
             pairs.push([shuffled[i], shuffled[i + 1]]);
         }
     }
