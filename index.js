@@ -88,7 +88,7 @@ async function bakeBasicBagels() {
         historyIssue = response.data;
     }
 
-    const history = historyIssue.body;
+    const history = JSON.parse(historyIssue.body) || [];
 
     // Throw some brute force compute at this
     let bestCombination;
