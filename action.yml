@@ -1,12 +1,18 @@
 name: 'Bagel'
 description: 'Meet your teammates'
 inputs:
+  slack-api-token:
+    description: 'The Slack API token. Should have at least permissions channels:read, im:write and chat:write. With permission users:read, can name users more nicely. Either this or slack-webhook is required.'
+    required: false
+  pairing-channels:
+    description: 'Comma separated list of names of channels in which to run. Required when using slack-api-token.'
+    required: false
   slack-aliases:
-    description: 'Comma separated list of Slack aliases to pair up.'
-    required: true
+    description: 'Unused otherwise. Comma separated list of Slack aliases to pair up. Required when using slack-webhook.'
+    required: false
   slack-webhook:
-    description: 'The Slack web hook for posting messages.'
-    required: true
+    description: 'The Slack web hook for posting messages. Either this or slack-api-token is required.'
+    required: false
 runs:
   using: 'node12'
   main: 'index.js'
