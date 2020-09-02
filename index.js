@@ -95,7 +95,7 @@ async function bakeBasicBagels() {
         }
     }
 
-    console.log(`History: ${history}`);
+    console.log(`History: ${JSON.stringify(history)}`);
 
     let bestCombination;
     if (history.length === 0) {
@@ -147,9 +147,9 @@ function score(pairs, history) {
     for (let pair of pairs) {
         let foundInHistory = false;
         // Go back through history
-        for (let i = history.length - 1; i >= 0; i++) {
+        for (let i = history.length - 1; i >= 0; i--) {
             const historicPairs = history[i];
-            console.log("historicPairs: " + historicPairs);
+            console.log("historicPairs: " + JSON.stringify(historicPairs));
             // Check if this pair occurred back then
             // TODO handle the odd case
             for (let historicPair of historicPairs) {
