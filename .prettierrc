@@ -1,4 +1,5 @@
 {
   "endOfLine": "auto",
-  "printWidth": 135
+  "printWidth": 135,
+  "tabWidth": 4
 }
