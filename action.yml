@@ -1,6 +1,9 @@
 name: 'Bagel'
 description: 'Meet your teammates'
 inputs:
+  github-token:
+    description: 'A token with access to the repository, with the right to create, read and edit issues.'
+    required: true
   slack-api-token:
     description: 'The Slack API token. Should have at least permissions channels:read, im:write and chat:write. With permission users:read, can name users more nicely. Either this or slack-webhook is required.'
     required: false
