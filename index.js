@@ -81,6 +81,7 @@ async function bakeBasicBagels() {
     let historyIssue = issues.find(i => i.title === historyIssueTitle);
     let history;
     if(!historyIssue) {
+        console.log("No history issue found: creating")
         const response = await octokit.issues.create({
             owner: repoOwnerName,
             repo: repoName,
@@ -89,6 +90,7 @@ async function bakeBasicBagels() {
         historyIssue = response.data;
         history = [];
     } else {
+        console.log(`Working with history: ${historyIssue.body}`);
         history = JSON.parse(historyIssue.body);
     }
 
@@ -97,9 +99,10 @@ async function bakeBasicBagels() {
     let highestScore = 0;
     for(let i = 0; i < NUM_ITERATIONS; i++) {
         bestCombination = createRandomPairs(aliases);
-        score = score(bestCombination, history);
-        if(score > highestScore) {
-            highestScore = score;
+        newScore = score(bestCombination, history);
+        if(newScore > highestScore) {
+            console.log(`New highest score: ${highestScore}, for combination ${JSON.stringify(bestCombination)}`);
+            highestScore = newScore;
             bestCombination = [...aliases];
         }
     }
