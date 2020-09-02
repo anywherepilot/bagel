@@ -95,18 +95,24 @@ async function bakeBasicBagels() {
         }
     }
 
-    // Throw some brute force compute at this
     let bestCombination;
-    let currentCombination;
-    let highestScore = 0;
-    let currentScore;
-    for (let i = 0; i < NUM_ITERATIONS; i++) {
-        currentCombination = createRandomPairs(aliases);
-        currentScore = score(currentCombination, history);
-        if (currentScore > highestScore) {
-            highestScore = currentScore;
-            bestCombination = currentCombination;
-            console.log(`New highest score in iteration ${i}: ${highestScore}, for combination ${JSON.stringify(bestCombination)}`);
+    if (history.length === 0) {
+        bestCombination = createRandomPairs(aliases);
+    } else {
+        let currentCombination;
+        let highestScore = 0;
+        let currentScore;
+        // Throw some brute force compute at this
+        for (let i = 0; i < NUM_ITERATIONS; i++) {
+            currentCombination = createRandomPairs(aliases);
+            currentScore = score(currentCombination, history);
+            if (currentScore > highestScore) {
+                highestScore = currentScore;
+                bestCombination = currentCombination;
+                console.log(
+                    `New highest score in iteration ${i}: ${highestScore}, for combination ${JSON.stringify(bestCombination)}`
+                );
+            }
         }
     }
 
@@ -143,7 +149,7 @@ function score(pairs, history) {
             const historicPairs = history[i];
             // Check if this pair occurred back then
             // TODO handle the odd case
-            for(let historicPair of historicPairs) {
+            for (let historicPair of historicPairs) {
                 if (pair.every((alias) => historicPair.includes(alias))) {
                     // The longer ago, the better
                     result += history.length - 1 - i;
@@ -151,7 +157,7 @@ function score(pairs, history) {
                     break;
                 }
             }
-            if(foundInHistory) break;        
+            if (foundInHistory) break;
         }
 
         // Prioritize new pairs hard
