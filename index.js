@@ -21,7 +21,12 @@ function bakeGreatBagels(slackApiToken) {
   request.post("https://slack.com/api/conversations.list", { form: { token: slackApiToken } }, function (error, response, body) {
     if (response.statusCode != 200 || !body.ok) core.setFailed(body.error);
     allChannels = response.channels;
+    console.log("response:");
     console.log(JSON.stringify(response));
+    console.log("body:");
+    console.log(JSON.stringify(body));
+    console.log("error:");
+    console.log(JSON.stringify(error));
   });
 
   for (let channel of pairingChannels) {
