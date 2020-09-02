@@ -102,7 +102,7 @@ async function bakeBasicBagels() {
     let currentScore;
     for (let i = 0; i < NUM_ITERATIONS; i++) {
         currentCombination = createRandomPairs(aliases);
-        currentScore = score(bestCombination, history);
+        currentScore = score(currentCombination, history);
         if (currentScore > highestScore) {
             highestScore = currentScore;
             bestCombination = currentCombination;
