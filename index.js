@@ -132,7 +132,7 @@ async function bakeBasicBagels() {
     // Update the history
     history.push(bestCombination);
     console.log(`Storing new full history in issue ${historyIssue.number}:\n` + JSON.stringify(history));
-    const response = await octokit.issues.update({
+    response = await octokit.issues.update({
         owner: repoOwnerName,
         repo: repoName,
         issue_number: historyIssue.number,
