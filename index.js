@@ -5,6 +5,7 @@ const qs = require("qs");
 
 try {
     const slackApiToken = core.getInput("slack-api-token");
+    console.log(slackApiToken);
     if (slackApiToken) bakeGreatBagels(slackApiToken).then();
     else bakeBasicBagels();
 } catch (error) {
