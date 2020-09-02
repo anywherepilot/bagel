@@ -5,7 +5,6 @@ const qs = require("qs");
 
 try {
     const slackApiToken = core.getInput("slack-api-token");
-    console.log(slackApiToken);
     if (slackApiToken) bakeGreatBagels(slackApiToken).then();
     else bakeBasicBagels();
 } catch (error) {
@@ -25,7 +24,7 @@ async function bakeGreatBagels(slackApiToken) {
     const scopes = responseData.scopes;
 
     // Get the list of channels
-    let responseData = await callSlackApi("conversations.list", { token: slackApiToken });
+    responseData = await callSlackApi("conversations.list", { token: slackApiToken });
     if (!responseData) return;
     const allChannels = responseData.channels;
 
