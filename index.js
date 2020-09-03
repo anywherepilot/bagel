@@ -7,7 +7,7 @@ const NUM_ITERATIONS = 1000;
 const HISTORY_ISSUE_TITLE = "Bagel history";
 
 try {
-    console.log("Bagel version 1.0.2");
+    console.log("Bagel version 1.0.3");
     const slackApiToken = core.getInput("slack-api-token");
     if (slackApiToken) bakeGreatBagels(slackApiToken).then();
     else bakeBasicBagels().then();
@@ -23,16 +23,16 @@ async function bakeBasicBagels() {
     const githubToken = core.getInput("github-token");
     const octokit = github.getOctokit(githubToken);
 
-    const historyIssue = getHistoryIssue(octokit);
+    const historyIssue = await getHistoryIssue(octokit);
     const history = getHistory(historyIssue);
 
     console.log(`History: ${JSON.stringify(history)}`);
 
     const pairList = getGoodPairList(aliases, history);
-    sendPairListSlackMessage(pairList);
+    await sendPairListSlackMessage(pairList);
 
     history.push(pairList);
-    updateHistory(history, historyIssue.number, octokit);
+    await updateHistory(history, historyIssue.number, octokit);
 }
 
 /**
