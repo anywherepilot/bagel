@@ -32,7 +32,7 @@ async function bakeBasicBagels() {
     sendPairListSlackMessage(pairList);
 
     history.push(pairList);
-    updateHistory(history, historyIssue.number);
+    updateHistory(history, historyIssue.number, octokit);
 }
 
 /**
@@ -190,8 +190,9 @@ async function sendPairListSlackMessage(pairList) {
  *
  * @param {string[][][]} history The history to write
  * @param {number} historyIssueNumber The number of the issue in the repo the action is running on whose body to replace with the history.
+ * @param {InstanceType<typeof GitHub>} octokit GitHub client.
  */
-async function updateHistory(history, historyIssueNumber) {
+async function updateHistory(history, historyIssueNumber, octokit) {
     console.log(`Storing new full history in issue ${historyIssueNumber}:\n` + JSON.stringify(history));
     await octokit.issues.update({
         owner: github.context.payload.repository.owner.name,
