@@ -7,6 +7,7 @@ const NUM_ITERATIONS = 1000;
 const HISTORY_ISSUE_TITLE = "Bagel history";
 
 try {
+    console.log("Bagel version 1.0.1");
     const slackApiToken = core.getInput("slack-api-token");
     if (slackApiToken) bakeGreatBagels(slackApiToken).then();
     else bakeBasicBagels().then();
