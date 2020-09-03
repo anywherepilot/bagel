@@ -8,6 +8,11 @@ This action will create an issue in your repository to keep track of the history
 
 ## Inputs
 
+There are two ways to use this action. One works, one doesn't. We here at Bagel suggest using the one that works.
+
+Option 1, which works, is to provide `slack-webhook` and `slack-aliases`.
+Option 2, which does not work, is to provide `slack-api-token` and `pairing-channels`.
+
 ### github-token
 
 The action needs access to your GitHub token in order to create an issue to keep the history, find the issue again and update its content.
