@@ -36,7 +36,7 @@ async function bakeBasicBagels() {
 
 /**
  * Reads the slack-aliases input and separates it into an array of aliases, making sure they all start with '@'.
- * 
+ *
  * @returns {string[]} The array of aliases provided to the action.
  */
 function getAliases() {
@@ -50,11 +50,11 @@ function getAliases() {
 
 /**
  * Gets the issue containing the history of pairs, creating it if necessary.
- * 
+ *
  * @param {InstanceType<typeof GitHub>} octokit GitHub client.
  * @returns {IssuesListForRepoResponseData} An issue in the repository the action is running in, containing the pairing history.
  */
-function getHistoryIssue(octokit) {
+async function getHistoryIssue(octokit) {
     const { data: issues } = await octokit.issues.listForRepo({
         owner: github.context.payload.repository.owner.name,
         repo: github.context.payload.repository.name,
@@ -77,7 +77,7 @@ function getHistoryIssue(octokit) {
 
 /**
  * Gets the pairing history from the body of an issue. Returns an empty array when there is no issue or no body.
- * 
+ *
  * @param {IssuesListForRepoResponseData} historyIssue The issue containing the history in its body property.
  * @returns {string[][][]} An outer array of historic pairings, which are themselves arrays of pairs, which are arrays of aliases.
  */
@@ -94,9 +94,9 @@ function getHistory(historyIssue) {
 /**
  * Creates a set of pairs of aliases trying to maximize new pairs and secondly pairs that have not happened for as long as possible,
  * based on the history.
- * 
+ *
  * If the aliases list contains an odd number, there will be one group of three.
- * 
+ *
  * @param {string[]} aliases The aliases to pair up.
  * @param {string[][][]} history The history of previous sets of pairs.
  * @returns {string[][]} A new list of pairs.
@@ -129,7 +129,7 @@ function getGoodPairList(aliases, history) {
 /**
  * Scores a set of pairs based on how long ago it has been for each pair to meet, the longer the better. Completely new pairs get
  * a very high score.
- * 
+ *
  * @param {string[][]} pairs The list of pairs to score
  * @param {string[][][]} history The historic context to score the list of pairs in.
  */
@@ -143,9 +143,13 @@ function score(pairs, history) {
         for (let i = history.length - 1; i >= 0; i--) {
             const historicPairs = history[i];
             // Check if this pair occurred back then
-            // TODO handle the odd case
             for (let historicPair of historicPairs) {
-                if (pair.every((alias) => historicPair.includes(alias))) {
+                if (
+                    (historicPair.includes(pair[0]) && historicPair.includes(pair[1])) ||
+                    (pair.length === 3 &&
+                        ((historicPair.includes(pair[0]) && historicPair.includes(pair[2])) ||
+                            (historicPair.includes(pair[1]) && historicPair.includes(pair[2]))))
+                ) {
                     // The longer ago, the better
                     result += history.length - 1 - i;
                     foundInHistory = true;
@@ -164,7 +168,7 @@ function score(pairs, history) {
 
 /**
  * Sends a message to the slack-webhook input with information on the pairs in the array.
- * 
+ *
  * @param {string[][]} pairList The pairs to inform.
  */
 async function sendPairListSlackMessage(pairList) {
@@ -182,11 +186,11 @@ async function sendPairListSlackMessage(pairList) {
 
 /**
  * Writes a history out to an issue.
- * 
+ *
  * @param {string[][][]} history The history to write
  * @param {number} historyIssueNumber The number of the issue in the repo the action is running on whose body to replace with the history.
  */
-function updateHistory(history, historyIssueNumber) {
+async function updateHistory(history, historyIssueNumber) {
     console.log(`Storing new full history in issue ${historyIssueNumber}:\n` + JSON.stringify(history));
     await octokit.issues.update({
         owner: github.context.payload.repository.owner.name,
@@ -200,7 +204,7 @@ function updateHistory(history, historyIssueNumber) {
  * Creates a pseudo random combination of pairs of aliases, with every alias in exactly one pair. All pairs contain two aliases, except
  * the last one in case of an odd number, in which case it contains three. An empty array returns an empty array, and an array with a
  * single element returns the array itself.
- * 
+ *
  * @param {string[]} aliases List of aliases to randomly pair up.
  */
 function createRandomPairs(aliases) {
@@ -226,7 +230,7 @@ function createRandomPairs(aliases) {
 
 /**
  * Takes an array and evenly pseudo-randomly shuffles its elements in place.
- * 
+ *
  * @param {any[]} array The array to shuffle.
  */
 function shuffleArray(array) {
@@ -239,36 +243,16 @@ function shuffleArray(array) {
     }
 }
 
-async function callSlackApi(method, arguments) {
-    const url = `https://slack.com/api/${method}`;
-    const config = {
-        headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-        },
-    };
-    const response = await axios.post(url, qs.stringify(arguments), config);
-    if (response.status != 200) {
-        core.setFailed(response.statusText);
-        return undefined;
-    }
-    if (!response.data.ok) {
-        core.setFailed(response.data.error);
-        return undefined;
-    }
-    // TODO pagination
-    return response.data;
-}
-
 /**
  * This method is a work in progress. Since it requires extensive permissions in Slack, it is unlikely large organizations
  * their administrators will allow the action to perform this activity. The goal is to:
- * 
+ *
  * - For a series of user provided channels.
  * - Get the list of members in those channels.
  * - Pair them up.
  * - Optionally get their user info so we can call them out by alias.
  * - Create a conversation for each pair, introducing them to one another. [not implemented]
- * 
+ *
  * @param {string} slackApiToken A Slack API token with enough rights to perform a series of actions. See README.
  */
 async function bakeGreatBagels(slackApiToken) {
@@ -311,4 +295,24 @@ async function bakeGreatBagels(slackApiToken) {
             // Create conversation
         }
     }
+}
+
+async function callSlackApi(method, arguments) {
+    const url = `https://slack.com/api/${method}`;
+    const config = {
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+        },
+    };
+    const response = await axios.post(url, qs.stringify(arguments), config);
+    if (response.status != 200) {
+        core.setFailed(response.statusText);
+        return undefined;
+    }
+    if (!response.data.ok) {
+        core.setFailed(response.data.error);
+        return undefined;
+    }
+    // TODO pagination
+    return response.data;
 }
